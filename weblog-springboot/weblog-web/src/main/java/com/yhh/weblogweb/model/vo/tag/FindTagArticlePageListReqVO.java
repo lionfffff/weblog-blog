@@ -1,0 +1,28 @@
+package com.yhh.weblogweb.model.vo.tag;
+
+import com.yhh.weblogcommon.model.BasePageQuery;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import javax.validation.constraints.NotNull;
+
+/**
+ * @Date 2025-06-30 20:41
+ * @ClassName: FindTagArticlePageListReqVO
+ * @Description:
+ */
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class FindTagArticlePageListReqVO extends BasePageQuery {
+
+    /**
+     * 标签 ID
+     */
+    @NotNull(message = "标签 ID 不能为空")
+    private Long id;
+
+}

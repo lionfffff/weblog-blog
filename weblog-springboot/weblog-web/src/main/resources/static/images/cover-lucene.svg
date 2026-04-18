@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="420" viewBox="0 0 800 420">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1f2937"/>
+      <stop offset="100%" stop-color="#ea580c"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="420" fill="url(#bg)"/>
+  <circle cx="250" cy="180" r="74" fill="none" stroke="#ffffff" stroke-width="18" opacity="0.25"/>
+  <line x1="302" y1="232" x2="364" y2="294" stroke="#ffffff" stroke-width="18" stroke-linecap="round" opacity="0.25"/>
+  <g fill="#ffffff" opacity="0.15">
+    <rect x="430" y="96" width="220" height="34" rx="10"/>
+    <rect x="430" y="150" width="180" height="20" rx="8"/>
+    <rect x="430" y="188" width="200" height="20" rx="8"/>
+    <rect x="430" y="226" width="140" height="20" rx="8"/>
+  </g>
+  <text x="60" y="320" font-size="44" font-family="Arial, sans-serif" fill="#ffffff" font-weight="700">Lucene Search</text>
+  <text x="60" y="356" font-size="22" font-family="Arial, sans-serif" fill="#ffedd5">indexing · analyzer · highlight</text>
+</svg>

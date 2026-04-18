@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --apple-bg: #f5f5f7;
+  --apple-card: rgba(255, 255, 255, 0.92);
+  --apple-border: rgba(229, 231, 235, 0.95);
+  --apple-text: #111827;
+  --apple-text-soft: #6b7280;
+  --apple-blue: #2563eb;
+  --apple-shadow: 0 18px 44px rgba(15, 23, 42, 0.05);
+  --apple-radius: 28px;
+}
+
+body {
+  font-family:
+    SF Pro Display,
+    SF Pro Text,
+    -apple-system,
+    BlinkMacSystemFont,
+    Helvetica Neue,
+    PingFang SC,
+    Hiragino Sans GB,
+    Microsoft YaHei,
+    Arial,
+    sans-serif;
+  color: var(--apple-text);
+  font-size: 16px;
+  background: var(--apple-bg);
+  line-height: 1.6;
+}
+
+button {
+  cursor: pointer;
+}
+
+[type='text']:focus,
+[type='email']:focus,
+[type='url']:focus,
+[type='password']:focus,
+[type='number']:focus,
+[type='date']:focus,
+[type='datetime-local']:focus,
+[type='month']:focus,
+[type='search']:focus,
+[type='tel']:focus,
+[type='time']:focus,
+[type='week']:focus,
+[multiple]:focus,
+textarea:focus,
+select:focus {
+  box-shadow: 0 0 0 1px transparent inset !important;
+}

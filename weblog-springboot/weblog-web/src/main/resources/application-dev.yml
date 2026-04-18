@@ -1,0 +1,42 @@
+server:
+  port: 8086
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/weblog?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false&zeroDateTimeBehavior=convertToNull
+    username: "root"
+    password: "041221"
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 20
+      auto-commit: true
+      idle-timeout: 30000
+      pool-name: weblog-Hikaricp
+      max-lifetime: 1800000
+      connection-timeout: 30000
+      connection-test-query: SELECT 1
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #控制台打印sql日志
+#sa-token:
+#  token-name: satoken
+#  timeout: 1800
+#  is-share: true
+#  is-read-cookie: true
+#  is-read-header: true
+#  is-log: true
+#  activity-timeout: -1
+#=================================================================
+# minio
+#=================================================================
+minio:
+  endpoint: http://127.0.0.1:9000
+  accessKey: BB6qW3wXbmR5AfSjAJ1w
+  secretKey: LSfRWJWkqBuPpPWXvL0vebU2bhnQt4FwM2qGWIFQ
+  bucketName: weblog
+#=================================================================
+# Lucene 全文检索
+#=================================================================
+lucene:
+  indexDir: E:\\lucene_index # lucene 索引存放的位置
+

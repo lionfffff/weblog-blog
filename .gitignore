@@ -1,0 +1,23 @@
+# IDE
+.idea/
+.vscode/
+*.log
+
+# Frontend
+weblog-vue/node_modules/
+weblog-vue/dist/
+weblog-vue/.npm-cache/
+weblog-vue/vite-dev*.err
+
+# Backend build/runtime
+weblog-springboot/**/target/
+weblog-springboot/uploaded-files/
+weblog-springboot/**/*.class
+
+# Temporary rebuild / patch files
+weblog-springboot/admin_layout_*_restyled.vue
+weblog-springboot/article_list_rebuilt*.vue
+weblog-springboot/fix_article_list_template.*
+weblog-springboot/rebuild_article_list_zh.js
+weblog-springboot/tmp_admin_restyle.ps1
+weblog-springboot/translate_admin_pages.js

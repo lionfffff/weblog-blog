@@ -1,0 +1,63 @@
+name: Build and Publish Docker Images
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - weblog-springboot/**
+      - weblog-vue/**
+      - .github/workflows/docker-images.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push backend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./weblog-springboot
+          file: ./weblog-springboot/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/weblog-backend:latest
+            ghcr.io/${{ github.repository_owner }}/weblog-backend:${{ github.sha }}
+
+  build-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./weblog-vue
+          file: ./weblog-vue/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/weblog-frontend:latest
+            ghcr.io/${{ github.repository_owner }}/weblog-frontend:${{ github.sha }}

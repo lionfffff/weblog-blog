@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="420" viewBox="0 0 800 420">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="420" fill="url(#bg)"/>
+  <g opacity="0.18" fill="#ffffff">
+    <rect x="86" y="98" width="110" height="110" rx="14"/>
+    <rect x="218" y="98" width="110" height="110" rx="14"/>
+    <rect x="350" y="98" width="110" height="110" rx="14"/>
+    <rect x="482" y="98" width="110" height="110" rx="14"/>
+    <rect x="614" y="98" width="110" height="110" rx="14"/>
+  </g>
+  <text x="60" y="310" font-size="44" font-family="Arial, sans-serif" fill="#ffffff" font-weight="700">Java Thread Pool</text>
+  <text x="60" y="350" font-size="22" font-family="Arial, sans-serif" fill="#bfdbfe">Executors · ThreadPoolExecutor · Reject Policy</text>
+</svg>
