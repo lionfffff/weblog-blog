@@ -73,7 +73,12 @@ const handleLogin = () => {
         showMessage('登录成功', 'success')
 
         const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : ''
-        router.replace(redirect || '/admin/index')
+        if (!redirect || redirect === '/blogs') {
+          router.replace(`/u/${userStore.userInfo?.username || form.username}`)
+          return
+        }
+
+        router.replace(redirect)
       })
       .finally(() => {
         loading.value = false
