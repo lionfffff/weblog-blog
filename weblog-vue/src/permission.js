@@ -34,7 +34,7 @@ router.beforeEach(async (to, from, next) => {
   if (to.params.username) {
     const username = to.params.username
     currentBlogStore.setCurrentBlog(username)
-    await blogSettingsStore.getBlogSettings(username)
+    blogSettingsStore.getBlogSettings(username)
   } else if (to.path === '/blogs') {
     blogSettingsStore.clearBlogSettings()
   }

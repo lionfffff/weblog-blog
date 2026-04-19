@@ -18,7 +18,7 @@
         <div class="section-title">我的博客</div>
         <article class="blog-card blog-card--mine" @click="enterBlog(myBlog.username)">
           <div class="blog-card__head">
-            <img class="blog-card__avatar" :src="myBlog.avatar || fallbackAvatar" />
+            <img class="blog-card__avatar" :src="myBlog.avatar || fallbackAvatar" @error="handleAvatarError" />
             <div>
               <div class="blog-card__title">
                 <h2>{{ myBlog.blogName }}</h2>
@@ -40,7 +40,7 @@
         <section class="blogs-grid">
           <article v-for="blog in otherBlogs" :key="blog.username" class="blog-card" @click="enterBlog(blog.username)">
             <div class="blog-card__head">
-              <img class="blog-card__avatar" :src="blog.avatar || fallbackAvatar" />
+              <img class="blog-card__avatar" :src="blog.avatar || fallbackAvatar" @error="handleAvatarError" />
               <div>
                 <h2>{{ blog.blogName }}</h2>
                 <p>@{{ blog.username }}</p>
@@ -68,6 +68,8 @@ import fallbackAvatar from '@/assets/avatar.png.jpg'
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { getBlogPortalList } from '@/api/fronted/blogsettings'
+import { getCachedValue, setCachedValue } from '@/composables/frontendCache'
+import { applyImageFallback, DEFAULT_AVATAR } from '@/composables/imageFallback'
 import { showMessage } from '@/composables/util'
 import { useCurrentBlogStore } from '@/stores/currentBlog'
 import { useUserStore } from '@/stores/user'
@@ -76,14 +78,22 @@ const router = useRouter()
 const blogs = ref([])
 const currentBlogStore = useCurrentBlogStore()
 const userStore = useUserStore()
+const PORTAL_CACHE_MS = 5 * 60 * 1000
 
 const myBlog = computed(() => blogs.value.find((blog) => blog.username === userStore.userInfo?.username) || null)
 const otherBlogs = computed(() => blogs.value.filter((blog) => blog.username !== userStore.userInfo?.username))
 
 onMounted(() => {
+  const cached = getCachedValue('portal-blogs', PORTAL_CACHE_MS)
+  if (cached) {
+    blogs.value = cached
+    return
+  }
+
   getBlogPortalList().then((res) => {
     if (res.success) {
       blogs.value = res.data || []
+      setCachedValue('portal-blogs', blogs.value)
     }
   })
 })
@@ -98,6 +108,10 @@ const handleLogout = () => {
   currentBlogStore.clearCurrentBlog()
   showMessage('已退出登录', 'success')
   router.push('/login')
+}
+
+const handleAvatarError = (event) => {
+  applyImageFallback(event, DEFAULT_AVATAR)
 }
 </script>
 

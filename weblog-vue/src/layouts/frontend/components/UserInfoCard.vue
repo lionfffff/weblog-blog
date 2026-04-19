@@ -47,6 +47,7 @@ import {
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { getStatisticsInfo } from '@/api/fronted/statistics'
+import { getCachedValue, setCachedValue } from '@/composables/frontendCache'
 import { useAdminAvatar } from '@/composables/useAdminAvatar'
 import { useBlogSettingsStore } from '@/stores/blogsettings'
 import { useCurrentBlogStore } from '@/stores/currentBlog'
@@ -56,6 +57,7 @@ const currentBlogStore = useCurrentBlogStore()
 const blogSettingsStore = useBlogSettingsStore()
 const statisticsInfo = ref({})
 const { avatarSrc, handleAvatarError } = useAdminAvatar()
+const STATISTICS_CACHE_MS = 5 * 60 * 1000
 
 const archiveTotal = computed(() => statisticsInfo.value.articleTotalCount || 0)
 
@@ -98,11 +100,25 @@ const statCards = computed(() => [
 ])
 
 const loadStatistics = () => {
+  const username = currentBlogStore.username
+  if (!username) {
+    statisticsInfo.value = {}
+    return
+  }
+
+  const cacheKey = `statistics:${username}`
+  const cached = getCachedValue(cacheKey, STATISTICS_CACHE_MS)
+  if (cached) {
+    statisticsInfo.value = cached
+    return
+  }
+
   getStatisticsInfo({
-    blogUsername: currentBlogStore.username,
+    blogUsername: username,
   }).then((res) => {
     if (res.success) {
       statisticsInfo.value = res.data || {}
+      setCachedValue(cacheKey, statisticsInfo.value)
     }
   })
 }

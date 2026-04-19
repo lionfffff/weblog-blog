@@ -22,18 +22,34 @@
 import { onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { getTagList } from '@/api/fronted/tag'
+import { getCachedValue, setCachedValue } from '@/composables/frontendCache'
 import { useCurrentBlogStore } from '@/stores/currentBlog'
 
 const router = useRouter()
 const currentBlogStore = useCurrentBlogStore()
 const tags = ref([])
+const TAG_CACHE_MS = 5 * 60 * 1000
 
 const loadTags = () => {
+  const username = currentBlogStore.username
+  if (!username) {
+    tags.value = []
+    return
+  }
+
+  const cacheKey = `tags:${username}`
+  const cached = getCachedValue(cacheKey, TAG_CACHE_MS)
+  if (cached) {
+    tags.value = cached
+    return
+  }
+
   getTagList({
     blogUsername: currentBlogStore.username,
   }).then((res) => {
     if (res.success) {
       tags.value = res.data || []
+      setCachedValue(cacheKey, tags.value)
     }
   })
 }

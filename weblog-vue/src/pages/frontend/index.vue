@@ -13,7 +13,7 @@
 
         <div class="article-grid">
           <article v-for="article in articles" :key="article.id" class="article-card">
-            <img class="article-card__cover" :src="article.cover" />
+            <img class="article-card__cover" :src="article.cover" @error="handleCoverError" />
             <div class="article-card__body">
               <div class="article-card__tags">
                 <button
@@ -67,6 +67,7 @@ import CategoryListCard from '@/layouts/frontend/components/CategoryListCard.vue
 import TagListCard from '@/layouts/frontend/components/TagListCard.vue'
 import ScrollToTopButton from '@/layouts/frontend/components/ScrollToTopButton.vue'
 import { getArticlePageList } from '@/api/fronted/article'
+import { applyImageFallback, DEFAULT_ARTICLE_COVER } from '@/composables/imageFallback'
 import { useCurrentBlogStore } from '@/stores/currentBlog'
 import { useBlogSettingsStore } from '@/stores/blogsettings'
 
@@ -106,6 +107,10 @@ watch(
     getArticles(1)
   },
 )
+
+const handleCoverError = (event) => {
+  applyImageFallback(event, DEFAULT_ARTICLE_COVER)
+}
 </script>
 
 <style scoped>

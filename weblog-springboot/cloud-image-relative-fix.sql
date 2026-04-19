@@ -18,7 +18,7 @@ SET avatar = '/images/avatars/avatar-03.svg'
 WHERE owner_id = 5;
 
 UPDATE t_blog_settings
-SET avatar = CONCAT('/uploads/', SUBSTRING_INDEX(avatar, '/uploads/', -1))
+SET avatar = '/images/avatar.svg'
 WHERE avatar LIKE '%/uploads/%';
 
 UPDATE t_blog_settings
@@ -31,5 +31,5 @@ SET cover = CONCAT('/images/', SUBSTRING_INDEX(cover, '/images/', -1))
 WHERE cover LIKE '%/images/%';
 
 UPDATE t_article
-SET cover = CONCAT('/uploads/', SUBSTRING_INDEX(cover, '/uploads/', -1))
+SET cover = '/images/cover-project.svg'
 WHERE cover LIKE '%/uploads/%';

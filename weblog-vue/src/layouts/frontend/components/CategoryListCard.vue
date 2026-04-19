@@ -23,19 +23,35 @@
 import { onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { getCategoryList } from '@/api/fronted/category'
+import { getCachedValue, setCachedValue } from '@/composables/frontendCache'
 import { useCurrentBlogStore } from '@/stores/currentBlog'
 
 const router = useRouter()
 const currentBlogStore = useCurrentBlogStore()
 const categories = ref([])
+const CATEGORY_CACHE_MS = 5 * 60 * 1000
 
 const loadCategories = () => {
+  const username = currentBlogStore.username
+  if (!username) {
+    categories.value = []
+    return
+  }
+
+  const cacheKey = `categories:${username}`
+  const cached = getCachedValue(cacheKey, CATEGORY_CACHE_MS)
+  if (cached) {
+    categories.value = cached
+    return
+  }
+
   getCategoryList({
     blogUsername: currentBlogStore.username,
     size: 10,
   }).then((res) => {
     if (res.success) {
       categories.value = res.data || []
+      setCachedValue(cacheKey, categories.value)
     }
   })
 }

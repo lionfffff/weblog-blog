@@ -3,7 +3,7 @@
     <div class="front-header__inner">
       <div class="front-header__top">
         <button class="brand" @click="goHome">
-          <img class="brand__logo" :src="blogSettingsStore.blogSettings.logo || currentBlogAvatar" />
+          <img class="brand__logo" :src="blogSettingsStore.blogSettings.logo || currentBlogAvatar" @error="handleBrandLogoError" />
           <div class="brand__copy">
             <span class="brand__eyebrow">正在浏览</span>
             <strong class="brand__title">{{ displayBlogName }}</strong>
@@ -36,7 +36,7 @@
                   :class="{ 'switcher-item--current': isCurrentBlog(myBlog.username) }"
                   @click="switchBlog(myBlog.username)"
                 >
-                  <img class="switcher-item__avatar" :src="myBlog.avatar || fallbackAvatar" />
+                  <img class="switcher-item__avatar" :src="myBlog.avatar || fallbackAvatar" @error="handleSwitcherAvatarError" />
                   <div class="switcher-item__body">
                     <div class="switcher-item__top">
                       <strong>{{ myBlog.blogName }}</strong>
@@ -59,7 +59,7 @@
                     :class="{ 'switcher-item--current': isCurrentBlog(blog.username) }"
                     @click="switchBlog(blog.username)"
                   >
-                    <img class="switcher-item__avatar" :src="blog.avatar || fallbackAvatar" />
+                    <img class="switcher-item__avatar" :src="blog.avatar || fallbackAvatar" @error="handleSwitcherAvatarError" />
                     <div class="switcher-item__body">
                       <div class="switcher-item__top">
                         <strong>{{ blog.blogName }}</strong>
@@ -105,7 +105,7 @@
             class="search-result"
             @click="jumpToArticleDetailPage(article.id)"
           >
-            <img :src="article.cover" />
+            <img :src="article.cover" @error="handleArticleCoverError" />
             <div>
               <h4 v-html="article.title"></h4>
               <p>{{ article.summary }}</p>
@@ -130,6 +130,8 @@ import { ArrowDown } from '@element-plus/icons-vue'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { getBlogPortalList, getBlogSettingsDetail } from '@/api/fronted/blogsettings'
+import { getCachedValue, setCachedValue } from '@/composables/frontendCache'
+import { applyImageFallback, DEFAULT_ARTICLE_COVER, DEFAULT_AVATAR, DEFAULT_LOGO } from '@/composables/imageFallback'
 import { getArticleSearchPageList } from '@/api/fronted/search'
 import { showMessage } from '@/composables/util'
 import { useBlogSettingsStore } from '@/stores/blogsettings'
@@ -148,6 +150,7 @@ const switcherVisible = ref(false)
 const portalBlogs = ref([])
 const accountAvatarRaw = ref('')
 const accountAvatarFailed = ref(false)
+const PORTAL_CACHE_MS = 5 * 60 * 1000
 
 const currentBlogAvatar = computed(() => {
   const blogAvatar = blogSettingsStore.blogSettings?.avatar
@@ -180,9 +183,16 @@ const myBlog = computed(() => portalBlogs.value.find((blog) => blog.username ===
 const otherBlogs = computed(() => portalBlogs.value.filter((blog) => blog.username !== userStore.userInfo?.username))
 
 const loadPortalBlogs = () => {
+  const cached = getCachedValue('portal-blogs', PORTAL_CACHE_MS)
+  if (cached) {
+    portalBlogs.value = cached
+    return
+  }
+
   getBlogPortalList().then((res) => {
     if (res.success) {
       portalBlogs.value = res.data || []
+      setCachedValue('portal-blogs', portalBlogs.value)
     }
   })
 }
@@ -262,6 +272,18 @@ const closeSearch = () => {
 
 const handleAccountAvatarError = () => {
   accountAvatarFailed.value = true
+}
+
+const handleBrandLogoError = (event) => {
+  applyImageFallback(event, DEFAULT_LOGO)
+}
+
+const handleSwitcherAvatarError = (event) => {
+  applyImageFallback(event, DEFAULT_AVATAR)
+}
+
+const handleArticleCoverError = (event) => {
+  applyImageFallback(event, DEFAULT_ARTICLE_COVER)
 }
 
 const logout = () => {
