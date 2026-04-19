@@ -9,12 +9,16 @@ export const useUserStore = defineStore(
     const userInfo = ref({})
 
     function setUserInfo() {
-      return getUserInfo().then((res) => {
-        if (res.success === true) {
-          userInfo.value = res.data || {}
-        }
-        return res
-      })
+      return getUserInfo()
+        .then((res) => {
+          if (res.success === true) {
+            userInfo.value = res.data || {}
+          }
+          return res
+        })
+        .catch(() => {
+          return { success: false }
+        })
     }
 
     function logout() {

@@ -28,7 +28,11 @@ router.beforeEach(async (to, from, next) => {
   }
 
   if (token && !userStore.userInfo?.username) {
-    await userStore.setUserInfo()
+    try {
+      await userStore.setUserInfo()
+    } catch {
+      // Keep navigation responsive even if user info loads slowly.
+    }
   }
 
   if (to.params.username) {
