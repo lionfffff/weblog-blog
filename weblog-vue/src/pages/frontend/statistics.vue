@@ -66,6 +66,7 @@ import FrontNavCard from '@/layouts/frontend/components/FrontNavCard.vue'
 import Header from '@/layouts/frontend/components/Header.vue'
 import TagListCard from '@/layouts/frontend/components/TagListCard.vue'
 import UserInfoCard from '@/layouts/frontend/components/UserInfoCard.vue'
+import { getCachedValue, setCachedValue } from '@/composables/frontendCache'
 import { useCurrentBlogStore } from '@/stores/currentBlog'
 
 const route = useRoute()
@@ -75,27 +76,54 @@ const pvTrendInfo = ref({
   pvDates: [],
   pvCounts: [],
 })
+const STATISTICS_PAGE_CACHE_MS = 5 * 60 * 1000
 
 const loadStatistics = () => {
+  const username = currentBlogStore.username
+  if (!username) {
+    pvTotalCount.value = 0
+    pvTrendInfo.value = { pvDates: [], pvCounts: [] }
+    return
+  }
+
+  const infoCacheKey = `statistics-page-info:${username}`
+  const trendCacheKey = `statistics-page-trend:${username}`
+  const cachedInfo = getCachedValue(infoCacheKey, STATISTICS_PAGE_CACHE_MS)
+  const cachedTrend = getCachedValue(trendCacheKey, STATISTICS_PAGE_CACHE_MS)
+
+  if (cachedInfo) {
+    pvTotalCount.value = cachedInfo.pvTotalCount || 0
+  }
+
+  if (cachedTrend) {
+    pvTrendInfo.value = cachedTrend
+    if (typeof cachedTrend.pvTotalCount === 'number') {
+      pvTotalCount.value = cachedTrend.pvTotalCount
+    }
+  }
+
   getStatisticsInfo({
-    blogUsername: currentBlogStore.username,
+    blogUsername: username,
   }).then((res) => {
     if (res.success) {
       pvTotalCount.value = res.data?.pvTotalCount || 0
+      setCachedValue(infoCacheKey, res.data || {})
     }
   })
 
   getStatisticsPVTrend({
-    blogUsername: currentBlogStore.username,
+    blogUsername: username,
   }).then((res) => {
     if (res.success) {
       pvTrendInfo.value = {
         pvDates: res.data?.pvDates || [],
         pvCounts: res.data?.pvCounts || [],
+        pvTotalCount: res.data?.pvTotalCount || 0,
       }
       if (typeof res.data?.pvTotalCount === 'number') {
         pvTotalCount.value = res.data.pvTotalCount
       }
+      setCachedValue(trendCacheKey, pvTrendInfo.value)
     }
   })
 }

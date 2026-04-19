@@ -151,6 +151,7 @@ const portalBlogs = ref([])
 const accountAvatarRaw = ref('')
 const accountAvatarFailed = ref(false)
 const PORTAL_CACHE_MS = 5 * 60 * 1000
+const ACCOUNT_AVATAR_CACHE_MS = 5 * 60 * 1000
 
 const currentBlogAvatar = computed(() => {
   const blogAvatar = blogSettingsStore.blogSettings?.avatar
@@ -204,10 +205,18 @@ const loadAccountAvatar = () => {
     return
   }
 
+  const cacheKey = `account-avatar:${username}`
+  const cached = getCachedValue(cacheKey, ACCOUNT_AVATAR_CACHE_MS)
+  if (cached) {
+    accountAvatarRaw.value = cached
+    return
+  }
+
   getBlogSettingsDetail({ blogUsername: username })
     .then((res) => {
       if (res.success) {
         accountAvatarRaw.value = res.data?.avatar || ''
+        setCachedValue(cacheKey, accountAvatarRaw.value)
       }
     })
     .catch(() => {

@@ -43,18 +43,35 @@ import UserInfoCard from '@/layouts/frontend/components/UserInfoCard.vue'
 import TagListCard from '@/layouts/frontend/components/TagListCard.vue'
 import ScrollToTopButton from '@/layouts/frontend/components/ScrollToTopButton.vue'
 import { getCategoryList } from '@/api/fronted/category'
+import { getCachedValue, setCachedValue } from '@/composables/frontendCache'
 import { useCurrentBlogStore } from '@/stores/currentBlog'
 
 const route = useRoute()
 const router = useRouter()
 const currentBlogStore = useCurrentBlogStore()
 const categories = ref([])
+const CATEGORY_PAGE_CACHE_MS = 5 * 60 * 1000
 
 const loadCategories = () => {
+  const username = currentBlogStore.username
+  if (!username) {
+    categories.value = []
+    return
+  }
+
+  const cacheKey = `category-page:${username}`
+  const cached = getCachedValue(cacheKey, CATEGORY_PAGE_CACHE_MS)
+  if (cached) {
+    categories.value = cached
+  }
+
   getCategoryList({
-    blogUsername: currentBlogStore.username,
+    blogUsername: username,
   }).then((res) => {
-    if (res.success) categories.value = res.data || []
+    if (res.success) {
+      categories.value = res.data || []
+      setCachedValue(cacheKey, categories.value)
+    }
   })
 }
 

@@ -41,20 +41,37 @@ import CategoryListCard from '@/layouts/frontend/components/CategoryListCard.vue
 import TagListCard from '@/layouts/frontend/components/TagListCard.vue'
 import ScrollToTopButton from '@/layouts/frontend/components/ScrollToTopButton.vue'
 import { getArchivePageList } from '@/api/fronted/archive'
+import { getCachedValue, setCachedValue } from '@/composables/frontendCache'
 import { useCurrentBlogStore } from '@/stores/currentBlog'
 
 const route = useRoute()
 const router = useRouter()
 const currentBlogStore = useCurrentBlogStore()
 const archives = ref([])
+const ARCHIVE_PAGE_CACHE_MS = 5 * 60 * 1000
 
 const loadArchives = () => {
+  const username = currentBlogStore.username
+  if (!username) {
+    archives.value = []
+    return
+  }
+
+  const cacheKey = `archive-page:${username}`
+  const cached = getCachedValue(cacheKey, ARCHIVE_PAGE_CACHE_MS)
+  if (cached) {
+    archives.value = cached
+  }
+
   getArchivePageList({
     current: 1,
     size: 50,
-    blogUsername: currentBlogStore.username,
+    blogUsername: username,
   }).then((res) => {
-    if (res.success) archives.value = res.data || []
+    if (res.success) {
+      archives.value = res.data || []
+      setCachedValue(cacheKey, archives.value)
+    }
   })
 }
 

@@ -3,6 +3,18 @@ import { getToken } from './composables/auth'
 import { showMessage } from '@/composables/util.js'
 import { useUserStore } from '@/stores/user.js'
 
+const SILENT_FRONTEND_ENDPOINTS = [
+  '/blog/settings/detail',
+  '/blog/portal/list',
+  '/article/list',
+  '/search/list',
+  '/category/list',
+  '/tag/list',
+  '/archive/list',
+  '/statistics/info',
+  '/statistics/pv/trend',
+]
+
 const instance = axios.create({
   baseURL: '/api',
   timeout: 20000,
@@ -35,6 +47,12 @@ instance.interceptors.response.use(
       const userStore = useUserStore()
       userStore.logout()
       location.reload()
+    }
+
+    const requestUrl = error.config?.url || ''
+    const shouldSilence = SILENT_FRONTEND_ENDPOINTS.some((prefix) => requestUrl.startsWith(prefix))
+    if (shouldSilence) {
+      return Promise.reject(error)
     }
 
     const errorMsg =
