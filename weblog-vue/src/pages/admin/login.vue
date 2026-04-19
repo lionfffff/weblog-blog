@@ -62,18 +62,19 @@ const handleLogin = () => {
 
     loading.value = true
     login(form.username, form.password)
-      .then(async (res) => {
+      .then((res) => {
         if (!res.success) {
           showMessage(res.message || '登录失败', 'error')
           return
         }
 
         setToken(res.data.token)
-        await userStore.setUserInfo()
+        userStore.setUserInfoPartial({ username: form.username })
+        userStore.setUserInfo()
         showMessage('登录成功', 'success')
 
         const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : ''
-        const resolvedUsername = userStore.userInfo?.username || form.username
+        const resolvedUsername = form.username
 
         if (!redirect || redirect === '/blogs') {
           router.replace(`/u/${resolvedUsername}`)

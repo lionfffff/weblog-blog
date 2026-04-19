@@ -8,6 +8,13 @@ export const useUserStore = defineStore(
   () => {
     const userInfo = ref({})
 
+    function setUserInfoPartial(data) {
+      userInfo.value = {
+        ...(userInfo.value || {}),
+        ...(data || {}),
+      }
+    }
+
     function setUserInfo() {
       return getUserInfo()
         .then((res) => {
@@ -26,6 +33,6 @@ export const useUserStore = defineStore(
       userInfo.value = {}
     }
 
-    return { userInfo, setUserInfo, logout }
+    return { userInfo, setUserInfo, setUserInfoPartial, logout }
   }
 )

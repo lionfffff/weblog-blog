@@ -67,6 +67,7 @@ import CategoryListCard from '@/layouts/frontend/components/CategoryListCard.vue
 import TagListCard from '@/layouts/frontend/components/TagListCard.vue'
 import ScrollToTopButton from '@/layouts/frontend/components/ScrollToTopButton.vue'
 import { getArticlePageList } from '@/api/fronted/article'
+import { getCachedValue, setCachedValue } from '@/composables/frontendCache'
 import { applyImageFallback, DEFAULT_ARTICLE_COVER } from '@/composables/imageFallback'
 import { useCurrentBlogStore } from '@/stores/currentBlog'
 import { useBlogSettingsStore } from '@/stores/blogsettings'
@@ -79,19 +80,41 @@ const articles = ref([])
 const current = ref(1)
 const size = ref(6)
 const pages = ref(1)
+const ARTICLE_CACHE_MS = 5 * 60 * 1000
 
 const getArticles = (pageNo) => {
   if (pageNo < 1 || (pages.value && pageNo > pages.value)) return
 
+  const username = currentBlogStore.username
+  if (!username) {
+    articles.value = []
+    current.value = 1
+    pages.value = 1
+    return
+  }
+
+  const cacheKey = `index-articles:${username}:${pageNo}:${size.value}`
+  const cached = getCachedValue(cacheKey, ARTICLE_CACHE_MS)
+  if (cached) {
+    articles.value = cached.data || []
+    current.value = cached.current || pageNo
+    pages.value = cached.pages || 1
+  }
+
   getArticlePageList({
     current: pageNo,
     size: size.value,
-    blogUsername: currentBlogStore.username,
+    blogUsername: username,
   }).then((res) => {
     if (res.success) {
       articles.value = res.data || []
       current.value = res.current || pageNo
       pages.value = res.pages || 1
+      setCachedValue(cacheKey, {
+        data: articles.value,
+        current: current.value,
+        pages: pages.value,
+      })
     }
   })
 }
