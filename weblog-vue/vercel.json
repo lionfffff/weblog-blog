@@ -3,7 +3,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://soxbzayzjvzs.us-east-1.clawcloudrun.com"
+      "destination": "https://soxbzayzjvzs.us-east-1.clawcloudrun.com/$1"
     }
   ]
 }
