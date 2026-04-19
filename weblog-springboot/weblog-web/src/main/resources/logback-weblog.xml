@@ -40,6 +40,7 @@
     <springProfile name="prod">
         <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
         <root level="INFO">
+            <appender-ref ref="CONSOLE" />
             <appender-ref ref="FILE" />
         </root>
     </springProfile>
