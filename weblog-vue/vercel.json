@@ -4,6 +4,14 @@
     {
       "source": "/api/(.*)",
       "destination": "https://soxbzayzjvzs.us-east-1.clawcloudrun.com/$1"
+    },
+    {
+      "source": "/images/(.*)",
+      "destination": "https://soxbzayzjvzs.us-east-1.clawcloudrun.com/images/$1"
+    },
+    {
+      "source": "/uploads/(.*)",
+      "destination": "https://soxbzayzjvzs.us-east-1.clawcloudrun.com/uploads/$1"
     }
   ]
 }
