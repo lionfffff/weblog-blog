@@ -42,7 +42,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .apply(jwtAuthenticationSecurityConfig)
                 .and()
                 .authorizeHttpRequests()
-                .mvcMatchers("/login", "/register",
+                .mvcMatchers("/login", "/register", "/health",
                         "/uploads/**", "/images/**",
                         "/doc.html", "/swagger-resources/**", "/webjars/**", "/v2/api-docs", "/favicon.ico")
                 .permitAll()
