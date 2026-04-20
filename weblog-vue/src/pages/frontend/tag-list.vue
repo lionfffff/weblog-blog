@@ -38,18 +38,35 @@ import UserInfoCard from '@/layouts/frontend/components/UserInfoCard.vue'
 import CategoryListCard from '@/layouts/frontend/components/CategoryListCard.vue'
 import ScrollToTopButton from '@/layouts/frontend/components/ScrollToTopButton.vue'
 import { getTagList } from '@/api/fronted/tag'
+import { getCachedValue, setCachedValue } from '@/composables/frontendCache'
 import { useCurrentBlogStore } from '@/stores/currentBlog'
 
 const route = useRoute()
 const router = useRouter()
 const currentBlogStore = useCurrentBlogStore()
 const tags = ref([])
+const TAG_PAGE_CACHE_MS = 5 * 60 * 1000
 
 const loadTags = () => {
+  const username = currentBlogStore.username
+  if (!username) {
+    tags.value = []
+    return
+  }
+
+  const cacheKey = `tag-page:${username}`
+  const cached = getCachedValue(cacheKey, TAG_PAGE_CACHE_MS)
+  if (cached) {
+    tags.value = cached
+  }
+
   getTagList({
-    blogUsername: currentBlogStore.username,
+    blogUsername: username,
   }).then((res) => {
-    if (res.success) tags.value = res.data || []
+    if (res.success) {
+      tags.value = res.data || []
+      setCachedValue(cacheKey, tags.value)
+    }
   })
 }
 
