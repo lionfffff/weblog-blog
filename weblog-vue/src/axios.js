@@ -4,6 +4,8 @@ import { showMessage } from '@/composables/util.js'
 import { useUserStore } from '@/stores/user.js'
 
 const SILENT_FRONTEND_ENDPOINTS = [
+  '/login',
+  '/admin/user/info',
   '/blog/settings/detail',
   '/blog/portal/list',
   '/article/list',

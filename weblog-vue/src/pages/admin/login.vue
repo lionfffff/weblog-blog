@@ -56,36 +56,80 @@ const rules = {
   password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
 }
 
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+
+const waitForBackend = async (attempts = 4, delayMs = 1200) => {
+  for (let index = 0; index < attempts; index += 1) {
+    try {
+      const response = await fetch('/api/health', {
+        method: 'GET',
+        cache: 'no-store',
+      })
+
+      if (response.ok) {
+        return true
+      }
+    } catch {
+      // ignore and retry
+    }
+
+    if (index < attempts - 1) {
+      await sleep(delayMs)
+    }
+  }
+
+  return false
+}
+
+const loginWithRetry = async (attempts = 4, delayMs = 1200) => {
+  let lastMessage = '登录失败，请稍后重试'
+
+  for (let index = 0; index < attempts; index += 1) {
+    try {
+      const res = await login(form.username, form.password)
+      if (res?.success) {
+        return res
+      }
+
+      lastMessage = res?.message || lastMessage
+    } catch (error) {
+      lastMessage = error?.response?.data?.message || lastMessage
+    }
+
+    if (index < attempts - 1) {
+      await sleep(delayMs)
+    }
+  }
+
+  throw new Error(lastMessage)
+}
+
 const handleLogin = () => {
-  formRef.value.validate((valid) => {
+  formRef.value.validate(async (valid) => {
     if (!valid) return
 
     loading.value = true
-    login(form.username, form.password)
-      .then((res) => {
-        if (!res.success) {
-          showMessage(res.message || '登录失败', 'error')
-          return
-        }
+    try {
+      await waitForBackend()
+      const res = await loginWithRetry()
 
-        setToken(res.data.token)
-        userStore.setUserInfoPartial({ username: form.username })
-        userStore.setUserInfo()
-        showMessage('登录成功', 'success')
+      setToken(res.data.token)
+      userStore.setUserInfoPartial({ username: form.username })
+      userStore.setUserInfo()
+      showMessage('登录成功', 'success')
 
-        const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : ''
-        const resolvedUsername = form.username
+      const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : ''
+      if (!redirect || redirect === '/blogs') {
+        router.replace(`/u/${form.username}`)
+        return
+      }
 
-        if (!redirect || redirect === '/blogs') {
-          router.replace(`/u/${resolvedUsername}`)
-          return
-        }
-
-        router.replace(redirect)
-      })
-      .finally(() => {
-        loading.value = false
-      })
+      router.replace(redirect)
+    } catch (error) {
+      showMessage(error?.message || '登录失败，请稍后重试', 'error')
+    } finally {
+      loading.value = false
+    }
   })
 }
 </script>
