@@ -15,19 +15,8 @@ const SILENT_FRONTEND_ENDPOINTS = [
   '/statistics/pv/trend',
 ]
 
-function resolveBaseURL() {
-  if (typeof window === 'undefined') return '/api'
-
-  const { hostname } = window.location
-  if (hostname === 'myweblog.site' || hostname === 'www.myweblog.site') {
-    return 'https://api.myweblog.site'
-  }
-
-  return '/api'
-}
-
 const instance = axios.create({
-  baseURL: resolveBaseURL(),
+  baseURL: '/api',
   timeout: 20000,
 })
 
